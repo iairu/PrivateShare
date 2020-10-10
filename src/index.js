@@ -10,6 +10,21 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 let isQuitting = false;
 let externalYTJS = readFileSync(path.join(__dirname, 'yt-userscript.js')).toString();
 
+// Helper function
+function menuAddTools(menu, win) {
+  menu.append(new MenuItem({
+    label: "[F11] DevTools",
+    accelerator: "F11",
+    click: ()=>{
+      if (!win.webContents.isDevToolsOpened()) {
+        win.webContents.openDevTools();
+      } else {
+        win.webContents.closeDevTools();
+      }
+    }
+  }));
+}
+
 const createBrowseWindow = () => {
   // Create the browser window.
   const win = new BrowserWindow({
@@ -41,24 +56,13 @@ const createBrowseWindow = () => {
     }
   })
   
+  // Menu management
   const menu = new Menu();
-
-  menu.append(new MenuItem({
-    label: "[F11] DevTools",
-    accelerator: "F11",
-    click: ()=>{
-      if (!win.webContents.isDevToolsOpened()) {
-        win.webContents.openDevTools();
-      } else {
-        win.webContents.closeDevTools();
-      }
-    }
-  }));
-
+  menuAddTools(menu,win);
   win.setMenu(menu);
-  
   win.setAutoHideMenuBar(true);
 
+  // User-script loading
   win.webContents.on("dom-ready",()=>{
       win.webContents.executeJavaScript(externalYTJS).catch(err => {});
       // the external user-script errors are ignored because
@@ -83,7 +87,13 @@ const createMenuWindow = () => {
   });
 
   win.loadFile(path.join(__dirname, 'menu.html'));
-  win.removeMenu();
+  
+  // Menu management
+  const menu = new Menu();
+  menuAddTools(menu,win);
+  win.setMenu(menu);
+  win.setAutoHideMenuBar(true);
+
   win.on("closed",()=>{
     app.quit();
   })
