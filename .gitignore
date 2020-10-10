@@ -90,3 +90,5 @@ out/
 
 src/*.csv
 src/*.bat
+
+/.vs
