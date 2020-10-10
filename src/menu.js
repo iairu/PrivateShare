@@ -2,7 +2,7 @@ const { remote, ipcRenderer } = require("electron");
 const { readFileSync } = require("fs");
 
 
-async function generateMenu(){
+(async function (){
 
     function generateFlag() {
         const flagELM = document.createElement("div");
@@ -71,9 +71,7 @@ async function generateMenu(){
         NavToHTML(lines);
         generateFlag();
     } catch (e) {
-        document.body.innerHTML = "No compatible ids.csv file entered.<br><button onclick=\"generateMenu()\">Try again</button>"
+        document.body.innerHTML = "No compatible ids.csv file entered.<br><button onclick=\"window.location.reload()\">Try again</button>"
     }
 
-}
-
-generateMenu();
+})();
