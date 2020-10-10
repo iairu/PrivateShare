@@ -23,6 +23,13 @@ function menuAddTools(menu, win) {
       }
     }
   }));
+  menu.append(new MenuItem({
+    label: "[F5] Reload",
+    accelerator: "F5",
+    click: ()=>{
+      win.webContents.executeJavaScript("window.location.reload()");
+    }
+  }));
 }
 
 const createBrowseWindow = () => {
