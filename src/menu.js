@@ -28,7 +28,8 @@ async function generateNavFromCSV() {
             if (!broken) {
                 const link = document.createElement("a");
                 link.href = "#";
-                link.onclick = ()=>{
+                link.onclick = (e)=>{
+                    e.preventDefault();
                     browseWindowGoto(generatePrivacyEditURL(pair[0]));
                     link.className = "clicked";
                 }
@@ -42,7 +43,7 @@ async function generateNavFromCSV() {
 
     try {
         const text = readFileSync((await getCSVpath()).filePaths[0]).toString(); // todo: guarantee utf-8
-        const lines = text.split("\r\n").map(line => line.split(";"));
+        const lines = text.split("\n").map(line => line.split(";"));
         document.body.innerHTML = ""; // Remove possible previous errors
         NavToHTML(lines);
     } catch (e) {
