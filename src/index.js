@@ -64,10 +64,15 @@ const createBrowseWindow = () => {
 
   // User-script loading
   win.webContents.on("dom-ready",()=>{
+      win.setTitle("Browse - PrivateShare");
       win.webContents.executeJavaScript(externalYTJS).catch(err => {});
       // the external user-script errors are ignored because
       // the script seems to work just fine and there is no
       // point in scaring the user away with console error spam
+  })
+
+  win.webContents.on("did-finish-load",()=>{
+    win.setTitle("Browse - PrivateShare");
   })
 };
 
@@ -96,6 +101,10 @@ const createMenuWindow = () => {
 
   win.on("closed",()=>{
     app.quit();
+  })
+
+  win.webContents.on("did-finish-load",()=>{
+    win.setTitle("Menu - PrivateShare");
   })
 };
 
