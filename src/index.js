@@ -1,4 +1,5 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, Menu, MenuItem } = require('electron');
+const { readFileSync } = require('fs');
 const path = require('path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -7,6 +8,7 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 }
 
 let isQuitting = false;
+let externalYTJS = readFileSync(path.join(__dirname, 'yt-userscript.js')).toString();
 
 const createBrowseWindow = () => {
   // Create the browser window.
@@ -20,16 +22,7 @@ const createBrowseWindow = () => {
     closable: false
   });
 
-  // Remove app info from User Agent
-  // Google login won't work without this
-  // Broken, userAgent option in loadURL instead
-  // let ua = win.webContents.userAgent;
-  // ua = ua.replace(/privateshare\/[0-9\.-]*\s/,'');
-  // ua = ua.replace(/Electron\/[^\s]*\s/,'');
-  // win.webContents.userAgent = ua;
-
   win.loadFile(path.join(__dirname, 'browse.html'));
-  win.removeMenu();
   
   // Listener for events that currently originate only from menu.js
   // Has to be on main process because the window contents get entirely changed
@@ -43,9 +36,35 @@ const createBrowseWindow = () => {
   // The window will just get recreated right afterwards
   win.on("closed",(e)=>{
     ipcMain.removeListener("bw-goto", bwGoToListener);
-    if (!isQuitting) createBrowseWindow();
+    if (!isQuitting) {
+      createBrowseWindow();
+    }
   })
-  // win.webContents.openDevTools();
+  
+  const menu = new Menu();
+
+  menu.append(new MenuItem({
+    label: "[F11] DevTools",
+    accelerator: "F11",
+    click: ()=>{
+      if (!win.webContents.isDevToolsOpened()) {
+        win.webContents.openDevTools();
+      } else {
+        win.webContents.closeDevTools();
+      }
+    }
+  }));
+
+  win.setMenu(menu);
+  
+  win.setAutoHideMenuBar(true);
+
+  win.webContents.on("dom-ready",()=>{
+      win.webContents.executeJavaScript(externalYTJS).catch(err => {});
+      // the external user-script errors are ignored because
+      // the script seems to work just fine and there is no
+      // point in scaring the user away with console error spam
+  })
 };
 
 const createMenuWindow = () => {
