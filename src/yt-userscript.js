@@ -56,8 +56,11 @@ loadedFlagELM.style = `
     pointer-events: none;
 `
 try {
+    // Show greenlight for a second, then orange
     document.querySelector(".yt-dialog-base").appendChild(loadedFlagELM);
+    setTimeout(()=>{loadedFlagELM.style.background = "orange";},1000);
 } catch (e) {
+    // A very clunky way of showing red color that only really shows on non-YouTube links
     loadedFlagELM.style.background = "red";
     document.body.appendChild(loadedFlagELM);
 }
