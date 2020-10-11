@@ -64,3 +64,29 @@ try {
     loadedFlagELM.style.background = "red";
     document.body.appendChild(loadedFlagELM);
 }
+
+// Get the amount of e-mail addresses already in the list for a quick confirmation
+// The peopleListAmount is not correct right after site load, interval guarantees the correctness
+// Refresh every half a sec
+let peopleListAmountRefreshCounter = 0;
+const peopleListAmountELM = document.createElement("div");
+const peopleListAmountInterval = setInterval(()=>{
+    try {
+
+        const peopleListAmount = document.querySelector(".acl-target-list-container").innerText.split("\n").length;
+        peopleListAmountELM.innerText = peopleListAmount;
+
+        if (!peopleListAmountRefreshCounter) { // Things that only need to happen once
+            peopleListAmountELM.style = `
+                position: fixed;
+                left: 0;
+                top: 0;
+                pointer-events: none;
+            `;
+            document.querySelector(".yt-dialog-base").appendChild(peopleListAmountELM);
+        }
+
+    } catch (e) {
+        clearInterval(peopleListAmountInterval);
+    }
+}, 500)
