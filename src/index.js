@@ -1,5 +1,4 @@
 const { app, BrowserWindow, ipcMain, dialog, Menu, MenuItem } = require('electron');
-const { readFileSync } = require('fs');
 const path = require('path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -8,7 +7,6 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 }
 
 let isQuitting = false;
-let externalYTJS = readFileSync(path.join(__dirname, 'yt-userscript.js')).toString();
 
 // Helper function
 function menuAddTools(menu, win) {
@@ -68,19 +66,6 @@ const createBrowseWindow = () => {
   menuAddTools(menu,win);
   win.setMenu(menu);
   win.setAutoHideMenuBar(true);
-
-  // User-script loading
-  win.webContents.on("dom-ready",()=>{
-      win.setTitle("Browse - PrivateShare");
-      win.webContents.executeJavaScript(externalYTJS).catch(err => {});
-      // the external user-script errors are ignored because
-      // the script seems to work just fine and there is no
-      // point in scaring the user away with console error spam
-  })
-
-  win.webContents.on("did-finish-load",()=>{
-    win.setTitle("Browse - PrivateShare");
-  })
 };
 
 const createMenuWindow = () => {
@@ -108,10 +93,6 @@ const createMenuWindow = () => {
 
   win.on("closed",()=>{
     app.quit();
-  })
-
-  win.webContents.on("did-finish-load",()=>{
-    win.setTitle("Menu - PrivateShare");
   })
 };
 
